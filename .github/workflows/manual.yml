@@ -23,15 +23,15 @@ on:
       licenseStartDate:
         required: true
         type: string
-        description: "Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18 05"
+        description: "licenseStartDate Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18 05"
       licenseEndDate:
         required: true
         type: string
-        description: "Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18 05"
+        description: "licenseEndDate Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18 05"
       reminderDate:
         required: true
         type: string
-        description: "Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18 05"
+        description: "reminderDate Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18 05"
       reminderInfoId:
         required: true
         type: number
