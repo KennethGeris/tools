@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: Manual workflow
+name: Create manual comms scripts
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -14,6 +14,7 @@ on:
       country:
          required: true
          type: choice
+         options:
           - US
           - CA
       licenseStartDate:
@@ -31,11 +32,13 @@ on:
       reminderType:
         required: true
         type: choice
+        options:
           - email
           - warning letter
-          - renewa
-
-
+          - renewal letter
+          - rabies vaccination letter
+        
+    
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
