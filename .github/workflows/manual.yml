@@ -35,7 +35,7 @@ on:
       flightDate:
         required: true
         type: string
-        description: "flightDate Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18"
+        description: "flightDate Format: YYYY-MM-DD HH, e.g. 2025-12-18"
       flightTime:
         required: true
         type: string
