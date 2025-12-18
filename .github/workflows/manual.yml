@@ -53,7 +53,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Runs a single command using the runners shell
-      - name: Validate numeric inputs
+      - name: Validate inputs
         run: |
           is_number() {
             [[ "$1" =~ ^[0-9]+$ ]]
