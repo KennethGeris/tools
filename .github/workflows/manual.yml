@@ -38,7 +38,7 @@ on:
         description: "flightDate Format: YYYY-MM-DD HH, e.g. 2025-12-18"
       flightTime:
         required: true
-        type: string
+        type: number
         description: "flightTime in EST"
       reminderInfoId:
         required: true
