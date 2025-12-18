@@ -39,7 +39,7 @@ on:
       flightTime:
         required: true
         type: string
-        description: "time in EST"
+        description: "flightTime in EST"
       reminderInfoId:
         required: true
         type: number
