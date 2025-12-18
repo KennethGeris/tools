@@ -27,15 +27,15 @@ on:
       licenseStartDate:
         required: true
         type: string
-        description: "licenseStartDate Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18 05"
+        description: "licenseStartDate Format: YYYY-MM-DD, e.g. 2025-12-18"
       licenseEndDate:
         required: true
         type: string
-        description: "licenseEndDate Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18 05"
-      reminderDate:
+        description: "licenseEndDate Format: YYYY-MM-DD HH, e.g. 2025-12-18"
+      flightDate:
         required: true
         type: string
-        description: "reminderDate Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18 05"
+        description: "flightDate Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18 05"
       reminderInfoId:
         required: true
         type: number
@@ -74,6 +74,9 @@ jobs:
           # YYYY-MM-DD HH (24-hour)
           is_yyyy_mm_dd_hh() { [[ "$1" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}[[:space:]][0-9]{2}$ ]]; }
 
+          # YYYY-MM-DD
+          is_yyyy_mm_dd() { [[ "$1" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; }
+  
           validate_number() {
             local label="$1"
             local value="$2"
@@ -83,7 +86,7 @@ jobs:
             fi
           }
 
-          validate_date() {
+          validate_flightDate() {
             local label="$1"
             local value="$2"
             local example="2025-12-18 05"
@@ -97,12 +100,27 @@ jobs:
               fail "❌ ${label} is not a valid date/time. Got: '${value}'"
             fi
           }
+          
+          validate_date() {
+            local label="$1"
+            local value="$2"
+            local example="2025-12-18"
+
+            if ! is_yyyy_mm_dd "$value"; then
+              fail "❌ ${label} must be in format 'YYYY-MM-DD'. Example: '${example}'. Got: '${value}'"
+            fi
+
+            # Validate it’s a real date/hour on Ubuntu (GNU date)
+            if ! date -d "$value" >/dev/null 2>&1; then
+              fail "❌ ${label} is not a valid date/time. Got: '${value}'"
+            fi
+          }
 
           validate_number "cityId" "${{ inputs.cityId }}"
           validate_number "reminderInfoId" "${{ inputs.reminderInfoId }}"
 
           validate_date "licenseStartDate" "${{ inputs.licenseStartDate }}"
           validate_date "licenseEndDate" "${{ inputs.licenseEndDate }}"
-          validate_date "reminderDate" "${{ inputs.reminderDate }}"
+          validate_flightDate "reminderDate" "${{ inputs.reminderDate }}"
 
           echo "✅ Validation passed"
