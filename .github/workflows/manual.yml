@@ -20,6 +20,10 @@ on:
       cityId:
         required: true
         type: number
+      cohorts:
+        required: true
+        type: number
+        default: 1
       licenseStartDate:
         required: true
         type: string
