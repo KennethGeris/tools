@@ -53,5 +53,20 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Runs a single command using the runners shell
-    - name: Send title
-      run: echo "${{ inputs.title }}"
+      - name: Validate numeric inputs
+        run: |
+          is_number() {
+            [[ "$1" =~ ^[0-9]+$ ]]
+          }
+
+          if ! is_number "${{ inputs.cityId }}"; then
+            echo "❌ cityId must be a number"
+            exit 1
+          fi
+
+          if ! is_number "${{ inputs.reminderInfoId }}"; then
+            echo "❌ reminderInfoId must be a number"
+            exit 1
+          fi
+
+          echo "✅ Numeric inputs validated"
