@@ -35,7 +35,11 @@ on:
       flightDate:
         required: true
         type: string
-        description: "flightDate Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18 05"
+        description: "flightDate Format: YYYY-MM-DD HH (24h), e.g. 2025-12-18"
+      flightTime:
+        required: true
+        type: string
+        description: "time in EST"
       reminderInfoId:
         required: true
         type: number
@@ -53,7 +57,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "greet"
-  validation:
+  validate inputs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -86,33 +90,7 @@ jobs:
             fi
           }
 
-          validate_flightDate() {
-            local label="$1"
-            local value="$2"
-            local example="2025-12-18 05"
-
-            if ! is_yyyy_mm_dd_hh "$value"; then
-              fail "❌ ${label} must be in format 'YYYY-MM-DD HH' (24h). Example: '${example}'. Got: '${value}'"
-            fi
-
-            # Validate it’s a real date/hour on Ubuntu (GNU date)
-            if ! date -d "${value}:00" >/dev/null 2>&1; then
-              fail "❌ ${label} is not a valid date/time. Got: '${value}'"
-            fi
-  
-  
-            # Ensure flight date is not in the past
-            local flight_epoch
-            local now_epoch
-            flight_epoch=$(date -d "${value}:00" +%s) || fail "❌ ${label} is not a valid date/time. Got: '${value}'"
-            now_epoch=$(date +%s)
-          
-            if [ "$flight_epoch" -lt "$now_epoch" ]; then
-              fail "❌ ${label} cannot be in the past. Got: '${value}'"
-            fi
-          }
-          
-          validate_date() {
+          validate_yyyy_mm_dd() {
             local label="$1"
             local value="$2"
             local example="2025-12-18"
@@ -126,12 +104,31 @@ jobs:
               fail "❌ ${label} is not a valid date/time. Got: '${value}'"
             fi
           }
+          
+          validate_flightDate() {
+            local label="$1"
+            local value="$2"
+            local example="2025-12-18"
 
+            validate_yyyy_mm_dd "$label" "$value"
+  
+            # Ensure flight date is not in the past
+            local flight_epoch
+            local now_epoch
+            flight_epoch=$(date -d "${value}:00" +%s) || fail "❌ ${label} is not a valid date/time. Got: '${value}'"
+            now_epoch=$(date +%s)
+          
+            if [ "$flight_epoch" -lt "$now_epoch" ]; then
+              fail "❌ ${label} cannot be in the past. Got: '${value}'"
+            fi
+          }
+
+          # validate inputs
           validate_number "cityId" "${{ inputs.cityId }}"
           validate_number "reminderInfoId" "${{ inputs.reminderInfoId }}"
 
-          validate_date "licenseStartDate" "${{ inputs.licenseStartDate }}"
-          validate_date "licenseEndDate" "${{ inputs.licenseEndDate }}"
+          validate_licenseDate "licenseStartDate" "${{ inputs.licenseStartDate }}"
+          validate_licenseDate "licenseEndDate" "${{ inputs.licenseEndDate }}"
           validate_flightDate "flightDate" "${{ inputs.flightDate }}"
 
           echo "✅ Validation passed"
