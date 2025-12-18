@@ -17,6 +17,9 @@ on:
          options:
           - US
           - CA
+      cityId:
+        required: true
+        type: number
       licenseStartDate:
         required: true
         type: string
@@ -26,7 +29,7 @@ on:
       reminderDate:
         required: true
         type: string
-      cityId:
+      reminderInfoId:
         required: true
         type: number
       reminderType:
