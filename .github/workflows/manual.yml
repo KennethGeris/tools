@@ -99,6 +99,17 @@ jobs:
             if ! date -d "${value}:00" >/dev/null 2>&1; then
               fail "❌ ${label} is not a valid date/time. Got: '${value}'"
             fi
+  
+  
+            # Ensure flight date is not in the past
+            local flight_epoch
+            local now_epoch
+            flight_epoch=$(date -d "${value}:00" +%s) || fail "❌ ${label} is not a valid date/time. Got: '${value}'"
+            now_epoch=$(date +%s)
+          
+            if [ "$flight_epoch" -lt "$now_epoch" ]; then
+              fail "❌ ${label} cannot be in the past. Got: '${value}'"
+            fi
           }
           
           validate_date() {
