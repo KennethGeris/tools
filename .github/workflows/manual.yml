@@ -132,6 +132,6 @@ jobs:
 
           validate_date "licenseStartDate" "${{ inputs.licenseStartDate }}"
           validate_date "licenseEndDate" "${{ inputs.licenseEndDate }}"
-          validate_flightDate "reminderDate" "${{ inputs.reminderDate }}"
+          validate_flightDate "flightDate" "${{ inputs.flightDate }}"
 
           echo "✅ Validation passed"
