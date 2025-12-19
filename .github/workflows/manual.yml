@@ -27,19 +27,19 @@ on:
       licenseStartDate:
         required: true
         type: string
-        description: "licenseStartDate Format: YYYY-MM-DD"
+        description: "license StartDate Format: YYYY-MM-DD"
       licenseEndDate:
         required: true
         type: string
-        description: "licenseEndDate Format: YYYY-MM-DD"
+        description: "license EndDate Format: YYYY-MM-DD"
       flightDate:
         required: true
         type: string
-        description: "flightDate(s) in future, If cohorts >1, comma-delimited YYYY-MM-DD dates"
+        description: "flight date(s) in future, If cohorts >1, comma-delimited YYYY-MM-DD dates"
       flightTime:
         required: true
         type: number
-        description: "flightTime in EST"
+        description: "flight time in EST"
       reminderInfoId:
         required: true
         type: number
