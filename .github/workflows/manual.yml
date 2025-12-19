@@ -110,12 +110,12 @@ jobs:
             validate_yyyy_mm_dd "$label" "$value"
   
             # Ensure flight date is not in the past
-            local flight_epoch
-            local now_epoch
-            now_epoch=$(date +%s)
+            local input_epoch today_epoch
+            input_epoch=$(date -d "${value} 00:00:00" +%s) || fail "❌ ${label} is not a valid date. Got: '${value}'"
+            today_epoch=$(date -d "$(date +%F) 00:00:00" +%s)
           
-            if [ "$flight_epoch" -lt "$now_epoch" ]; then
-              fail "❌ ${label} cannot be in the past. Got: '${value}'"
+            if [ "$input_epoch" -lt "$today_epoch" ]; then
+            fail "❌ ${label} cannot be before today. Got: '${value}'"
             fi
           }
 
