@@ -24,7 +24,6 @@ on:
         required: true
         type: number
         default: 1
-        description: "Cohort(s), If >1, comma-delimited YYYY-MM-DD dates"
       licenseStartDate:
         required: true
         type: string
@@ -36,7 +35,7 @@ on:
       flightDate:
         required: true
         type: string
-        description: "flightDate Format: YYYY-MM-DD"
+        description: "flightDate(s) in future, If cohorts >1, comma-delimited YYYY-MM-DD dates"
       flightTime:
         required: true
         type: number
@@ -44,7 +43,7 @@ on:
       reminderInfoId:
         required: true
         type: number
-        description: "ReminderInfoId(s) If >1, comma-delimited reminderInfoIds"
+        description: "ReminderInfoId(s) If cohorts >1, comma-delimited reminderInfoIds"
       reminderType:
         required: true
         type: choice
