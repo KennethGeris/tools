@@ -121,6 +121,7 @@ jobs:
 
           validate_number "cityId" "${{ inputs.cityId }}"
           validate_number "reminderInfoId" "${{ inputs.reminderInfoId }}"
+          validate_number "flightTime" "${{ inputs.flightTime }}"
 
           validate_yyyy_mm_dd "licenseStartDate" "${{ inputs.licenseStartDate }}"
           validate_yyyy_mm_dd "licenseEndDate" "${{ inputs.licenseEndDate }}"
