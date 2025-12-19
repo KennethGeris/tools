@@ -24,6 +24,7 @@ on:
         required: true
         type: number
         default: 1
+        description: "If cohorts>1, comma-delimited YYYY-MM-DD dates. e.g 2025-12-18,2025-12-19"
       licenseStartDate:
         required: true
         type: string
@@ -31,11 +32,11 @@ on:
       licenseEndDate:
         required: true
         type: string
-        description: "licenseEndDate Format: YYYY-MM-DD HH, e.g. 2025-12-18"
+        description: "licenseEndDate Format: YYYY-MM-DD, e.g. 2025-12-18"
       flightDate:
         required: true
         type: string
-        description: "flightDate Format: YYYY-MM-DD HH, e.g. 2025-12-18"
+        description: "flightDate Format: YYYY-MM-DD, e.g. 2025-12-18"
       flightTime:
         required: true
         type: number
@@ -43,6 +44,7 @@ on:
       reminderInfoId:
         required: true
         type: number
+        description: "If cohorts>1, comma-delimited reminderInfoIds. e.g 1453,1454"
       reminderType:
         required: true
         type: choice
@@ -51,8 +53,6 @@ on:
           - warning letter
           - renewal letter
           - rabies vaccination letter
-
-
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -118,13 +118,65 @@ jobs:
             fail "❌ ${label} cannot be before today. Got: '${value}'"
             fi
           }
+          
+          trim() { echo "$1" | xargs; }
+  
+          split_csv() {
+            # Usage: split_csv arr_name "a,b,c"
+            local -n _arr=$1
+            local input="$2"
+            IFS=',' read -r -a _arr <<< "$input"
+            for i in "${!_arr[@]}"; do
+              _arr[$i]=$(trim "${_arr[$i]}")
+            done
+          }
+            
+          require_csv_if_cohorts_gt_1() {
+            local label="$1"
+            local value="$2"
+            local cohorts="$3"
+          
+            if [ "$cohorts" -gt 1 ]; then
+            if [[ "$value" != *","* ]]; then
+                fail "❌ ${label} must be comma-delimited when cohorts > 1 (cohorts=${cohorts}). Got: '${value}'"
+              fi
+            fi
+          }
 
+          cohorts="${{ inputs.cohorts }}"
+          
+          # Require comma-delimited when cohorts > 1
+          require_csv_if_cohorts_gt_1 "flightDate" "${{ inputs.flightDate }}" "$cohorts"
+          require_csv_if_cohorts_gt_1 "reminderInfoId" "${{ inputs.reminderInfoId }}" "$cohorts"
+          
+          # Split into arrays (works for 1 or many)
+          declare -a flight_dates
+          declare -a reminder_ids
+          split_csv flight_dates "${{ inputs.flightDate }}"
+          split_csv reminder_ids "${{ inputs.reminderInfoId }}"
+          
+          # Count must match cohorts
+          if [ "${#flight_dates[@]}" -ne "$cohorts" ]; then
+            fail "❌ flightDate must contain ${cohorts} value(s). Got: ${#flight_dates[@]} (${flight_dates[*]})"
+          fi
+          
+          if [ "${#reminder_ids[@]}" -ne "$cohorts" ]; then
+            fail "❌ reminderInfoId must contain ${cohorts} value(s). Got: ${#reminder_ids[@]} (${reminder_ids[*]})"
+          fi
+          
+          # Validate each
+          for i in "${!flight_dates[@]}"; do
+            validate_date_in_future "flightDate[$((i+1))]" "${flight_dates[$i]}"
+          done
+          
+          for i in "${!reminder_ids[@]}"; do
+            validate_number "reminderInfoId[$((i+1))]" "${reminder_ids[$i]}"
+          done
+  
           validate_number "cityId" "${{ inputs.cityId }}"
-          validate_number "reminderInfoId" "${{ inputs.reminderInfoId }}"
           validate_number "flightTime" "${{ inputs.flightTime }}"
 
           validate_yyyy_mm_dd "licenseStartDate" "${{ inputs.licenseStartDate }}"
           validate_yyyy_mm_dd "licenseEndDate" "${{ inputs.licenseEndDate }}"
-          validate_date_in_future "flightDate" "${{ inputs.flightDate }}"
 
           echo "✅ Validation passed"
