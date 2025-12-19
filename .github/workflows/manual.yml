@@ -24,7 +24,7 @@ on:
         required: true
         type: number
         default: 1
-        description: "If cohorts>1, comma-delimited YYYY-MM-DD dates. e.g 2025-12-18,2025-12-19"
+        description: "Cohort(s), If >1, comma-delimited YYYY-MM-DD dates. e.g 2025-12-18,2025-12-19"
       licenseStartDate:
         required: true
         type: string
@@ -44,7 +44,7 @@ on:
       reminderInfoId:
         required: true
         type: number
-        description: "If cohorts>1, comma-delimited reminderInfoIds. e.g 1453,1454"
+        description: "ReminderInfoId(s) If >1, comma-delimited reminderInfoIds. e.g 1453,1454"
       reminderType:
         required: true
         type: choice
