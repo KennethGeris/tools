@@ -105,7 +105,7 @@ jobs:
             fi
           }
           
-          validate_flightDate() {
+          validate_date_in_future() {
             local label="$1"
             local value="$2"
             local example="2025-12-18"
@@ -126,8 +126,8 @@ jobs:
           validate_number "cityId" "${{ inputs.cityId }}"
           validate_number "reminderInfoId" "${{ inputs.reminderInfoId }}"
 
-          validate_licenseDate "licenseStartDate" "${{ inputs.licenseStartDate }}"
-          validate_licenseDate "licenseEndDate" "${{ inputs.licenseEndDate }}"
-          validate_flightDate "flightDate" "${{ inputs.flightDate }}"
+          validate_yyyy_mm_dd "licenseStartDate" "${{ inputs.licenseStartDate }}"
+          validate_yyyy_mm_dd "licenseEndDate" "${{ inputs.licenseEndDate }}"
+          validate_date_in_future "flightDate" "${{ inputs.flightDate }}"
 
           echo "✅ Validation passed"
