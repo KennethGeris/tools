@@ -4,178 +4,197 @@ name: Create manual comms scripts
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
-on:
-  workflow_dispatch:
-    # Inputs the workflow accepts.
-    inputs:
-      title:
-        required: true
-        type: string
-      country:
-        required: true
-        type: choice
-        options:
-          - US
-          - CA
-      cityId:
-        required: true
-        type: number
-      cohorts:
-        required: true
-        type: number
-        default: 1
-      licenseStartDate:
-        required: true
-        type: string
-        description: "license StartDate Format: YYYY-MM-DD"
-      licenseEndDate:
-        required: true
-        type: string
-        description: "license EndDate Format: YYYY-MM-DD"
-      flightDate:
-        required: true
-        type: string
-        description: "flight date(s) in future, If cohorts >1, comma-delimited YYYY-MM-DD dates"
-      flightTime:
-        required: true
-        type: number
-        description: "flight time in EST"
-      reminderInfoId:
-        required: true
-        type: number
-        description: "ReminderInfoId(s) If cohorts >1, comma-delimited reminderInfoIds"
-      reminderType:
-        required: true
-        type: choice
-        options:
-          - email
-          - warning letter
-          - renewal letter
-          - rabies vaccination letter
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+on:
+  repository_dispatch:
+    types: [create-manual-comms]
+
 jobs:
-  # This workflow contains a single job called "greet"
-  validate_inputs:
-    # The type of runner that the job will run on
+  debug_payload:
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Validate inputs
-      - name: Validate inputs
-        shell: bash
+      - name: Echo full repository_dispatch payload
         run: |
-          fail() {
-            # GitHub Actions formatted error
-            echo "::error title=Validation failed::$1"
-            exit 1
-          }
+          echo "Full payload:"
+          echo '${{ toJson(github.event.client_payload) }}'
 
-          is_number() { [[ "$1" =~ ^[0-9]+$ ]]; }
+      - name: Echo individual payload fields
+        run: |
+          echo "issue_key: ${{ github.event.client_payload.issue_key }}"
+          echo "summary: ${{ github.event.client_payload.summary }}"
+          echo "description: ${{ github.event.client_payload.description }}"
+#   workflow_dispatch:
+#     # Inputs the workflow accepts.
+#     inputs:
+#       title:
+#         required: true
+#         type: string
+#       country:
+#         required: true
+#         type: choice
+#         options:
+#           - US
+#           - CA
+#       cityId:
+#         required: true
+#         type: number
+#       cohorts:
+#         required: true
+#         type: number
+#         default: 1
+#       licenseStartDate:
+#         required: true
+#         type: string
+#         description: "license StartDate Format: YYYY-MM-DD"
+#       licenseEndDate:
+#         required: true
+#         type: string
+#         description: "license EndDate Format: YYYY-MM-DD"
+#       flightDate:
+#         required: true
+#         type: string
+#         description: "flight date(s) in future, If cohorts >1, comma-delimited YYYY-MM-DD dates"
+#       flightTime:
+#         required: true
+#         type: number
+#         description: "flight time in EST"
+#       reminderInfoId:
+#         required: true
+#         type: number
+#         description: "ReminderInfoId(s) If cohorts >1, comma-delimited reminderInfoIds"
+#       reminderType:
+#         required: true
+#         type: choice
+#         options:
+#           - email
+#           - warning letter
+#           - renewal letter
+#           - rabies vaccination letter
 
-          # YYYY-MM-DD
-          is_yyyy_mm_dd() { [[ "$1" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; }
+# # A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# jobs:
+#   # This workflow contains a single job called "greet"
+#   validate_inputs:
+#     # The type of runner that the job will run on
+#     runs-on: ubuntu-latest
+
+#     # Steps represent a sequence of tasks that will be executed as part of the job
+#     steps:
+#       # Validate inputs
+#       - name: Validate inputs
+#         shell: bash
+#         run: |
+#           fail() {
+#             # GitHub Actions formatted error
+#             echo "::error title=Validation failed::$1"
+#             exit 1
+#           }
+
+#           is_number() { [[ "$1" =~ ^[0-9]+$ ]]; }
+
+#           # YYYY-MM-DD
+#           is_yyyy_mm_dd() { [[ "$1" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; }
   
-          validate_number() {
-            local label="$1"
-            local value="$2"
+#           validate_number() {
+#             local label="$1"
+#             local value="$2"
 
-            if ! is_number "$value"; then
-              fail "❌ ${label} must be a whole number (digits only). Got: '${value}'"
-            fi
-          }
+#             if ! is_number "$value"; then
+#               fail "❌ ${label} must be a whole number (digits only). Got: '${value}'"
+#             fi
+#           }
 
-          validate_yyyy_mm_dd() {
-            local label="$1"
-            local value="$2"
-            local example="2025-12-18"
+#           validate_yyyy_mm_dd() {
+#             local label="$1"
+#             local value="$2"
+#             local example="2025-12-18"
 
-            if ! is_yyyy_mm_dd "$value"; then
-              fail "❌ ${label} must be in format 'YYYY-MM-DD'. Example: '${example}'. Got: '${value}'"
-            fi
+#             if ! is_yyyy_mm_dd "$value"; then
+#               fail "❌ ${label} must be in format 'YYYY-MM-DD'. Example: '${example}'. Got: '${value}'"
+#             fi
 
-            # Validate it’s a real date/hour on Ubuntu (GNU date)
-            if ! date -d "$value" >/dev/null 2>&1; then
-              fail "❌ ${label} is not a valid date/time. Got: '${value}'"
-            fi
-          }
+#             # Validate it’s a real date/hour on Ubuntu (GNU date)
+#             if ! date -d "$value" >/dev/null 2>&1; then
+#               fail "❌ ${label} is not a valid date/time. Got: '${value}'"
+#             fi
+#           }
           
-          validate_date_in_future() {
-            local label="$1"
-            local value="$2"
-            local example="2025-12-18"
+#           validate_date_in_future() {
+#             local label="$1"
+#             local value="$2"
+#             local example="2025-12-18"
 
-            validate_yyyy_mm_dd "$label" "$value"
+#             validate_yyyy_mm_dd "$label" "$value"
   
-            # Ensure flight date is not in the past
-            local input_epoch today_epoch
-            input_epoch=$(date -d "${value} 00:00:00" +%s)
-            today_epoch=$(date -d "$(date +%F) 00:00:00" +%s)
+#             # Ensure flight date is not in the past
+#             local input_epoch today_epoch
+#             input_epoch=$(date -d "${value} 00:00:00" +%s)
+#             today_epoch=$(date -d "$(date +%F) 00:00:00" +%s)
           
-            if [ "$input_epoch" -lt "$today_epoch" ]; then
-            fail "❌ ${label} cannot be before today. Got: '${value}'"
-            fi
-          }
+#             if [ "$input_epoch" -lt "$today_epoch" ]; then
+#             fail "❌ ${label} cannot be before today. Got: '${value}'"
+#             fi
+#           }
           
-          trim() { echo "$1" | xargs; }
+#           trim() { echo "$1" | xargs; }
   
-          split_csv() {
-            # Usage: split_csv arr_name "a,b,c"
-            local -n _arr=$1
-            local input="$2"
-            IFS=',' read -r -a _arr <<< "$input"
-            for i in "${!_arr[@]}"; do
-              _arr[$i]=$(trim "${_arr[$i]}")
-            done
-          }
+#           split_csv() {
+#             # Usage: split_csv arr_name "a,b,c"
+#             local -n _arr=$1
+#             local input="$2"
+#             IFS=',' read -r -a _arr <<< "$input"
+#             for i in "${!_arr[@]}"; do
+#               _arr[$i]=$(trim "${_arr[$i]}")
+#             done
+#           }
             
-          require_csv_if_cohorts_gt_1() {
-            local label="$1"
-            local value="$2"
-            local cohorts="$3"
+#           require_csv_if_cohorts_gt_1() {
+#             local label="$1"
+#             local value="$2"
+#             local cohorts="$3"
           
-            if [ "$cohorts" -gt 1 ]; then
-            if [[ "$value" != *","* ]]; then
-                fail "❌ ${label} must be comma-delimited when cohorts > 1 (cohorts=${cohorts}). Got: '${value}'"
-              fi
-            fi
-          }
+#             if [ "$cohorts" -gt 1 ]; then
+#             if [[ "$value" != *","* ]]; then
+#                 fail "❌ ${label} must be comma-delimited when cohorts > 1 (cohorts=${cohorts}). Got: '${value}'"
+#               fi
+#             fi
+#           }
 
-          cohorts="${{ inputs.cohorts }}"
+#           cohorts="${{ inputs.cohorts }}"
           
-          # Require comma-delimited when cohorts > 1
-          require_csv_if_cohorts_gt_1 "flightDate" "${{ inputs.flightDate }}" "$cohorts"
-          require_csv_if_cohorts_gt_1 "reminderInfoId" "${{ inputs.reminderInfoId }}" "$cohorts"
+#           # Require comma-delimited when cohorts > 1
+#           require_csv_if_cohorts_gt_1 "flightDate" "${{ inputs.flightDate }}" "$cohorts"
+#           require_csv_if_cohorts_gt_1 "reminderInfoId" "${{ inputs.reminderInfoId }}" "$cohorts"
           
-          # Split into arrays (works for 1 or many)
-          declare -a flight_dates
-          declare -a reminder_ids
-          split_csv flight_dates "${{ inputs.flightDate }}"
-          split_csv reminder_ids "${{ inputs.reminderInfoId }}"
+#           # Split into arrays (works for 1 or many)
+#           declare -a flight_dates
+#           declare -a reminder_ids
+#           split_csv flight_dates "${{ inputs.flightDate }}"
+#           split_csv reminder_ids "${{ inputs.reminderInfoId }}"
           
-          # Count must match cohorts
-          if [ "${#flight_dates[@]}" -ne "$cohorts" ]; then
-            fail "❌ flightDate must contain ${cohorts} value(s). Got: ${#flight_dates[@]} (${flight_dates[*]})"
-          fi
+#           # Count must match cohorts
+#           if [ "${#flight_dates[@]}" -ne "$cohorts" ]; then
+#             fail "❌ flightDate must contain ${cohorts} value(s). Got: ${#flight_dates[@]} (${flight_dates[*]})"
+#           fi
           
-          if [ "${#reminder_ids[@]}" -ne "$cohorts" ]; then
-            fail "❌ reminderInfoId must contain ${cohorts} value(s). Got: ${#reminder_ids[@]} (${reminder_ids[*]})"
-          fi
+#           if [ "${#reminder_ids[@]}" -ne "$cohorts" ]; then
+#             fail "❌ reminderInfoId must contain ${cohorts} value(s). Got: ${#reminder_ids[@]} (${reminder_ids[*]})"
+#           fi
           
-          # Validate each
-          for i in "${!flight_dates[@]}"; do
-            validate_date_in_future "flightDate[$((i+1))]" "${flight_dates[$i]}"
-          done
+#           # Validate each
+#           for i in "${!flight_dates[@]}"; do
+#             validate_date_in_future "flightDate[$((i+1))]" "${flight_dates[$i]}"
+#           done
           
-          for i in "${!reminder_ids[@]}"; do
-            validate_number "reminderInfoId[$((i+1))]" "${reminder_ids[$i]}"
-          done
+#           for i in "${!reminder_ids[@]}"; do
+#             validate_number "reminderInfoId[$((i+1))]" "${reminder_ids[$i]}"
+#           done
   
-          validate_number "cityId" "${{ inputs.cityId }}"
-          validate_number "flightTime" "${{ inputs.flightTime }}"
+#           validate_number "cityId" "${{ inputs.cityId }}"
+#           validate_number "flightTime" "${{ inputs.flightTime }}"
 
-          validate_yyyy_mm_dd "licenseStartDate" "${{ inputs.licenseStartDate }}"
-          validate_yyyy_mm_dd "licenseEndDate" "${{ inputs.licenseEndDate }}"
+#           validate_yyyy_mm_dd "licenseStartDate" "${{ inputs.licenseStartDate }}"
+#           validate_yyyy_mm_dd "licenseEndDate" "${{ inputs.licenseEndDate }}"
 
-          echo "✅ Validation passed"
+#           echo "✅ Validation passed"
