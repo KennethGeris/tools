@@ -6,6 +6,9 @@ name: Create manual comms scripts
 # or API.
 
 on:
+  repository_dispatch: 
+    types: [test]
+      
   workflow_dispatch:
     inputs:
       issue_key:
