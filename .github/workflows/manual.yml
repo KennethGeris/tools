@@ -17,19 +17,28 @@ on:
       description:
         required: true
         type: string
-  repository_dispatch:
-    types:
-      - create-manual-comms
 
 jobs:
-  debug:
+  decode:
     runs-on: ubuntu-latest
     steps:
-      - name: Echo payload (works for both)
+      - name: Decode description (HTML → human readable)
+        shell: bash
         run: |
-          echo "event_name: ${{ github.event_name }}"
-          echo "workflow_dispatch inputs: ${{ toJson(inputs) }}"
-          echo "repository_dispatch client_payload: ${{ toJson(github.event.client_payload) }}"
+          python3 - << 'EOF'
+          import html
+      
+          issue_key = """${{ inputs.issue_key }}"""
+          summary = """${{ inputs.summary }}"""
+          description = """${{ inputs.description }}"""
+      
+          print("Issue Key:")
+          print(issue_key)
+          print("\nSummary:")
+          print(summary)
+          print("\nDescription (decoded):")
+          print(html.unescape(description))
+          EOF
 #   workflow_dispatch:
 #     # Inputs the workflow accepts.
 #     inputs:
