@@ -6,24 +6,30 @@ name: Create manual comms scripts
 # or API.
 
 on:
+  workflow_dispatch:
+    inputs:
+      issue_key:
+        required: true
+        type: string
+      summary:
+        required: true
+        type: string
+      description:
+        required: true
+        type: string
   repository_dispatch:
-    types: [create-manual-comms]
+    types:
+      - create-manual-comms
 
 jobs:
-  debug_payload:
+  debug:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Echo full repository_dispatch payload
+      - name: Echo payload (works for both)
         run: |
-          echo "Full payload:"
-          echo '${{ toJson(github.event.client_payload) }}'
-
-      - name: Echo individual payload fields
-        run: |
-          echo "issue_key: ${{ github.event.client_payload.issue_key }}"
-          echo "summary: ${{ github.event.client_payload.summary }}"
-          echo "description: ${{ github.event.client_payload.description }}"
+          echo "event_name: ${{ github.event_name }}"
+          echo "workflow_dispatch inputs: ${{ toJson(inputs) }}"
+          echo "repository_dispatch client_payload: ${{ toJson(github.event.client_payload) }}"
 #   workflow_dispatch:
 #     # Inputs the workflow accepts.
 #     inputs:
